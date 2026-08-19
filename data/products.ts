@@ -4,4 +4,5 @@ export const products = [
   { name: 'Fightshort Protect Ya Neck', type: 'Fightshort No-Gi', image: '/assets/fightshort-protect.jpeg' },
   { name: 'Colección Serpiente', type: 'Fightshort TVA', image: '/assets/fightshort-collection.jpg' },
   { name: 'TVA 50/50', type: 'Fightshort TVA', image: '/assets/tva_50_50.jpg'},
+  {name: 'Hoodies TVA', type: 'Hoodie TVA', image: '/assets/hoodies.png'},
 ];

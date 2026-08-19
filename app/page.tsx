@@ -10,7 +10,6 @@ export default function Home() {
     </section>
 
     <section className="ticker" aria-label="Disciplinas"><span>JIU JITSU</span><b>✦</b><span>MMA</span><b>✦</b><span>SUBMISSION GRAPPLING</span><b>✦</b><span>NO-GI</span></section>
-  
     
   </main>;
 }
