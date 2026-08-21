@@ -534,6 +534,49 @@ h2 em {
   color: var(--black);
 }
 
+.product-detail {
+  display: grid;
+  grid-template-columns: minmax(300px, 0.85fr) minmax(360px, 1.15fr);
+  align-items: center;
+  gap: clamp(35px, 6vw, 90px);
+  background: var(--white);
+  color: var(--black);
+}
+
+.product-detail-image {
+  height: clamp(400px, 62vh, 620px);
+  overflow: hidden;
+  background: #151515;
+}
+
+.product-detail-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.product-detail-info {
+  max-width: 650px;
+}
+
+.product-detail-info h1 {
+  margin: 18px 0 28px;
+  font-size: clamp(42px, 5vw, 76px);
+  line-height: 0.9;
+}
+
+.product-detail-info > p:not(.product-detail-price) {
+  color: #67635e;
+  line-height: 1.75;
+}
+
+.product-detail-price {
+  margin: 28px 0;
+  color: var(--red);
+  font-size: 24px;
+  font-weight: 900;
+}
 
 .shop-heading {
   display: flex;
@@ -615,15 +658,40 @@ h2 em {
   color: var(--red);
   font-size: 12px;
   font-weight: 800;
+}.product-card-link {
+  display: block;
+  color: inherit;
 }
 
-.product-info button {
+.product-card-link:focus-visible {
+  outline: 3px solid var(--red);
+  outline-offset: 3px;
+}
+
+.product-card-link .product-card {
+  height: 100%;
+}
+.product-link {
   width: 42px;
   height: 42px;
   flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: 1px solid #ccc;
   background: #fff;
+  color: var(--black);
   cursor: pointer;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
+}
+
+
+.product-link:hover {
+  background: var(--red);
+  border-color: var(--red);
+  color: #fff;
 }
 
 .catalog-note {
@@ -721,7 +789,17 @@ footer img {
   .hero-content {
     align-self: end;
   }
+.product-detail {
+  grid-template-columns: 1fr;
+}
 
+.product-detail-image {
+  height: min(110vw, 620px);
+}
+
+.product-detail-info {
+  max-width: none;
+}
   .academy,
   .coach,
   .instructionals {

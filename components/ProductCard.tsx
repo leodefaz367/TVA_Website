@@ -1,30 +1,41 @@
-type Product ={
-    name: string;
-    type: string;
-    image: string;
-}
+import Link from "next/link";
+import type { Product } from "@/data/products"
+
 type ProductCardProps = {
     product: Product;
 }
 export default function ProductCard({product,}: ProductCardProps) {
     return(
-        <article className="product-card">
-            <div className="product-image">
-            <img src={product.image} alt={product.name}/>
-            <span>TVA</span>
-            </div>
+                <Link
+                    className="product-card-link"
+                    href={`/tienda/${product.slug}`}
+                    aria-label={`Ver ${product.name}`}
+                >
+                    <article className="product-card">
+                        <div className="product-image">
+                            <img src={product.image} alt={product.name} />
+                            <span>TVA</span>
+                        </div>
 
-            <div className= "product-info">
-                <div>
-                    <small>{product.type}</small>
-                    <h3>{product.name}</h3>
-                    <p>Precio por confirmar</p>
-                </div>
+                        <div className="product-info">
+                            <div>
+                                <small>{product.type}</small>
+                                <h3>{product.name}</h3>
+                            
+                                <p>
+                                    {product.price ===null ? "Precio por confirmar"
+                                    : new Intl.NumberFormat("es-Ec", {
+                                        style: "currency",
+                                        currency: "USD",
+                                    }).format(product.price)}
+                                </p>
+                            </div>
 
-                <button type="button" aria-label={`Ver ${product.name}`}>
-                    →
-                    </button>
-            </div>
-        </article>
+                            <span className="product-link" aria-hidden="true">
+                                    →
+                            </span>
+                        </div>
+                    </article>    
+                </Link>
     )
 }
