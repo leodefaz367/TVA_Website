@@ -138,12 +138,7 @@ img {
 
 .hero-shade {
   background:
-    linear-gradient(
-      90deg,
-      #000000f2 0%,
-      #000000b0 42%,
-      #00000029 80%
-    ),
+    linear-gradient(90deg, #000000f2 0%, #000000b0 42%, #00000029 80%),
     linear-gradient(0deg, #000000c7, transparent 45%);
 }
 
@@ -271,9 +266,7 @@ h2 em {
 }
 
 .section {
-  padding:
-    clamp(80px, 10vw, 150px)
-    clamp(24px, 7vw, 120px);
+  padding: clamp(80px, 10vw, 150px) clamp(24px, 7vw, 120px);
 }
 
 .section.page-section {
@@ -394,11 +387,7 @@ h2 em {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    0deg,
-    rgba(0, 0, 0, 0.45),
-    transparent 45%
-  );
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.45), transparent 45%);
   pointer-events: none;
 }
 
@@ -471,9 +460,7 @@ h2 em {
 }
 
 .course-copy {
-  padding:
-    clamp(70px, 9vw, 135px)
-    clamp(35px, 7vw, 100px);
+  padding: clamp(70px, 9vw, 135px) clamp(35px, 7vw, 100px);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -658,7 +645,8 @@ h2 em {
   color: var(--red);
   font-size: 12px;
   font-weight: 800;
-}.product-card-link {
+}
+.product-card-link {
   display: block;
   color: inherit;
 }
@@ -686,7 +674,6 @@ h2 em {
     background-color 0.2s,
     color 0.2s;
 }
-
 
 .product-link:hover {
   background: var(--red);
@@ -748,6 +735,26 @@ footer img {
   height: auto;
 }
 
+.footer-admin-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: #c8c5bf;
+  font-size: 14px;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.footer-admin-link:hover,
+.footer-admin-link:focus-visible {
+  color: #fff;
+}
+
+.footer-admin-link:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 4px;
+}
+
 /* =========================
    TABLET
    ========================= */
@@ -789,17 +796,17 @@ footer img {
   .hero-content {
     align-self: end;
   }
-.product-detail {
-  grid-template-columns: 1fr;
-}
+  .product-detail {
+    grid-template-columns: 1fr;
+  }
 
-.product-detail-image {
-  height: min(110vw, 620px);
-}
+  .product-detail-image {
+    height: min(110vw, 620px);
+  }
 
-.product-detail-info {
-  max-width: none;
-}
+  .product-detail-info {
+    max-width: none;
+  }
   .academy,
   .coach,
   .instructionals {
@@ -821,14 +828,14 @@ footer img {
   .shop-heading {
     display: block;
   }
-  .coach{
+  .coach {
     grid-template-columns: 1fr;
   }
 
-  .coach-photo{
+  .coach-photo {
     height: min(110vw, 650px);
   }
-  .coach-details{
+  .coach-details {
     max-width: none;
   }
 }
@@ -867,15 +874,14 @@ footer img {
     justify-content: flex-start;
   }
 
-.section {
-  padding: 75px 24px;
-}
+  .section {
+    padding: 75px 24px;
+  }
 
-.section.page-section {
-  min-height: calc(100vh - 72px);
-  padding-top: 24px;
-}
-
+  .section.page-section {
+    min-height: calc(100vh - 72px);
+    padding-top: 24px;
+  }
 
   .stats {
     justify-content: space-between;
@@ -906,7 +912,7 @@ footer img {
     flex-direction: column;
     align-items: flex-start;
   }
-  .coach-photo{
+  .coach-photo {
     height: 480px;
   }
 
@@ -914,8 +920,8 @@ footer img {
     font-size: clamp(48px, 16vw, 72px);
   }
   .instructionals-page {
-  min-height: calc(100vh - 72px);
-}
+    min-height: calc(100vh - 72px);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

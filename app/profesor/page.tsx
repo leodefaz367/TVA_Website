@@ -1,9 +1,10 @@
-export default function ProfesorPage(){
+import SiteImage from "../../components/SiteImage";
+export default function ProfesorPage() {
   return (
     <main>
       <section className="coach section page-section">
         <div className="coach-photo">
-          <img
+          <SiteImage
             src="/assets/michael-vivas.png"
             alt="Michael Vivas, profesor de Team Vivas Academy"
           />

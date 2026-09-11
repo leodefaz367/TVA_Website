@@ -1,18 +1,26 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-
+import "./commerce.css";
+import SiteShell from "../layouts/SiteShell";
+export const metadata: Metadata = {
+  title: {
+    default: "Team Vivas Academy | Jiu Jitsu en Quito",
+    template: "%s | Team Vivas Academy",
+  },
+  description:
+    "Jiu Jitsu, MMA y Submission Grappling en el sur de Quito. Conoce la academia, nuestra indumentaria y los instruccionales TVA.",
+  icons: { icon: "/favicon.svg" },
+};
 export default function RootLayout({
-    children,
-}:Readonly<{children: React.ReactNode;}>){
-    return(
-        <html lang="es">
-            <body>
-                <Header />
-                {children}
-                <Footer/>
-            </body>
-        </html>
-    )
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="es">
+      <body>
+        <SiteShell>{children}</SiteShell>
+      </body>
+    </html>
+  );
 }
