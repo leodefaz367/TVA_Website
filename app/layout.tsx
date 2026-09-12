@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import "./commerce.css";
 import SiteShell from "../layouts/SiteShell";
+// Dynamic rendering is required for a fresh CSP nonce on each response.
+export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: {
     default: "Team Vivas Academy | Jiu Jitsu en Quito",

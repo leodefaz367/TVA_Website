@@ -12,6 +12,6 @@ El proyecto conserva React, TypeScript, Vite y Vinext. En este equipo Supabase y
 
 Sin Supabase configurado, las páginas institucionales siguen disponibles y las vistas comerciales muestran un aviso de conexión.
 
-Comandos de comprobación: `npm run typecheck`, `npm run lint`, `npm test`, `npm run test:components`, `npm run build` y `npm run test:rendered`.
+Comandos de comprobación: `npm run typecheck`, `npm run lint`, `npm test`, `npm run test:components`, `npm run build` y `npm run test:production`. El build principal prepara Vercel; consulta DEPLOYMENT.md antes de publicar. El desarrollo sigue usando localhost:5173.
 
 Lee README.md para operaciones del panel, DATABASE.md para el esquema e IMPLEMENTATION_REPORT.md para el estado y las comprobaciones pendientes.

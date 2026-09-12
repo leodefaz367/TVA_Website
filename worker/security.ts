@@ -34,6 +34,12 @@ export function secureResponse(
   );
   headers.set("X-Frame-Options", "DENY");
   headers.delete("X-Powered-By");
+  headers.delete("Access-Control-Allow-Origin");
+  headers.delete("Access-Control-Allow-Credentials");
+  if (new URL(request.url).pathname.startsWith("/admin")) {
+    headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
+    headers.set("Cache-Control", "private, no-store");
+  }
   if (new URL(request.url).protocol === "https:")
     headers.set("Strict-Transport-Security", "max-age=31536000");
   if (headers.get("content-type")?.includes("text/html")) {

@@ -11,17 +11,21 @@ test("security migration enforces roles, revocation, quotas and auditing", async
     await db.exec(`create role anon; create role authenticated; create schema auth; create schema storage;
       create table auth.users(id uuid primary key,banned_until timestamptz);
       create table auth.sessions(id uuid primary key,user_id uuid,not_after timestamptz);
+      create table auth.mfa_factors(user_id uuid,status text);
       create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;
-      create function auth.jwt() returns jsonb language sql stable as $$select jsonb_build_object('session_id',current_setting('request.jwt.claim.session_id',true))$$;
+      create function auth.jwt() returns jsonb language sql stable as $$select jsonb_build_object('session_id',current_setting('request.jwt.claim.session_id',true),'aal',current_setting('request.jwt.claim.aal',true))$$;
       grant usage on schema public,auth,storage to anon,authenticated;
       create table storage.buckets(id text primary key,name text,public boolean,file_size_limit bigint,allowed_mime_types text[]);
       create table storage.objects(id uuid primary key default gen_random_uuid(),bucket_id text,name text);
       alter table storage.objects enable row level security;
-      grant select,insert,update,delete on storage.objects to anon,authenticated;`);
+      grant select,insert,update,delete on storage.objects to anon,authenticated;
+      alter default privileges in schema public grant all on tables to anon,authenticated;`);
     for (const file of [
       "202609100001_commerce.sql",
       "202609100002_security.sql",
+      "202609110001_instructionals.sql",
       "202609120001_academy_photos.sql",
+      "202609120002_release_hardening.sql",
     ])
       await db.exec(
         await readFile(
@@ -265,7 +269,7 @@ test("security migration enforces roles, revocation, quotas and auditing", async
       async () => {
         await identity(admin, session);
         await db.query(
-          "insert into public.academy_photos(url,alt) values ('https://example.com/one.jpg','Primera'),('https://example.com/two.jpg','Segunda')",
+          "insert into public.academy_photos(url,alt) values ('https://test.supabase.co/storage/v1/object/public/academy-images/11111111-1111-4111-8111-111111111111.jpg','Primera'),('https://test.supabase.co/storage/v1/object/public/academy-images/22222222-2222-4222-8222-222222222222.jpg','Segunda')",
         );
         assert.equal(
           (await db.query("select * from public.academy_photos")).rows.length,
@@ -295,6 +299,109 @@ test("security migration enforces roles, revocation, quotas and auditing", async
             "insert into storage.objects(bucket_id,name) values ('academy-images',$1)",
             [crypto.randomUUID() + ".jpg"],
           ),
+        );
+      },
+    );
+    await t.test(
+      "RC rejects mass assignment, mismatched types and private setting leaks",
+      async () => {
+        await identity(admin, session);
+        await db.query(
+          "insert into public.site_settings(key,value) values ('private_note','not-public'),('address','Academia')",
+        );
+      await assert.rejects(() =>
+        db.query(
+          "insert into public.site_settings(key,value) values ('bank_transfer','{}')",
+        ),
+      );
+      await assert.rejects(() => db.query("update public.product_variants set stock=-500 where id=$1", [v]));
+      const draftCourse = (await db.query("insert into public.products(name,slug,kind) values ('Curso de prueba RC','curso-rc','course') returning id")).rows[0].id;
+      await db.query("insert into public.instructional_courses(product_id) values ($1)", [draftCourse]);
+      await assert.rejects(() => db.query("insert into public.instructional_delivery_settings(product_id,drive_url) values ($1,'https://drive.google.com/drive/folders/example/una-ruta-no-permitida')", [draftCourse]));
+        await assert.rejects(() =>
+          db.query(
+            "update public.product_variants set product_id=gen_random_uuid() where id=$1",
+            [v],
+          ),
+        );
+      await identity(ordinary, "", "anon");
+      await assert.rejects(() => db.query("truncate public.academy_photos"));
+        assert.equal(
+          (
+            await db.query(
+              "select * from public.site_settings where key='private_note'",
+            )
+          ).rows.length,
+          0,
+        );
+        assert.equal(
+          (
+            await db.query(
+              "select * from public.site_settings where key='address'",
+            )
+          ).rows.length,
+          1,
+        );
+        for (const change of [
+          { role: "admin" },
+          { paid: true },
+          { name: 123 },
+        ]) {
+          await assert.rejects(
+            () =>
+              db.query("select public.create_order($1,$2,$3)", [
+                crypto.randomUUID(),
+                JSON.stringify({ ...customer, ...change }),
+                JSON.stringify([{ variant_id: v, quantity: 1 }]),
+              ]),
+            /INVALID_ORDER/,
+          );
+        }
+        for (const change of [{ price_cents: 1 }, { quantity: "1" }]) {
+          await assert.rejects(
+            () =>
+              order(crypto.randomUUID(), [
+                { variant_id: v, quantity: 1, ...change },
+              ]),
+            /INVALID_ITEMS/,
+          );
+        }
+        await assert.rejects(() =>
+          db.query("select private.create_order_with_quotas($1,$2,$3)", [
+            crypto.randomUUID(),
+            JSON.stringify(customer),
+            "[]",
+          ]),
+        );
+      },
+    );
+    await t.test(
+      "verified MFA factors require aal2 in database policies",
+      async () => {
+        await db.exec("reset role");
+        await db.query(
+          "insert into auth.mfa_factors(user_id,status) values ($1,'verified')",
+          [admin],
+        );
+        await identity(admin, session);
+        assert.equal(
+          (await db.query("select public.is_admin() ok")).rows[0].ok,
+          false,
+        );
+        await assert.rejects(() =>
+          db.query(
+            "insert into public.categories(name,slug) values ('Blocked','blocked')",
+          ),
+        );
+        await db.query(
+          "select set_config('request.jwt.claim.aal','aal2',false)",
+        );
+        assert.equal(
+          (await db.query("select public.is_admin() ok")).rows[0].ok,
+          true,
+        );
+        await db.query(
+          "insert into public.categories(name,slug) values ('MFA','mfa')",
         );
       },
     );

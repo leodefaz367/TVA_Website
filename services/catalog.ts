@@ -1,7 +1,7 @@
 import { getSupabase } from "./supabase";
 import type { Category, Product, ProductKind } from "../types/commerce";
 export const productSelect =
-  "*, product_variants(*), product_images(*), instructional_courses(*), instructional_modules(*)";
+  "id,name,slug,description,category_id,kind,status,featured,created_at,updated_at, product_variants(id,product_id,sku,color,size,price_cents,stock,active), product_images(id,product_id,variant_id,url,alt,position,is_primary), instructional_courses(product_id,trainer,level,delivery_note,trailer_url), instructional_modules(id,product_id,title,description,position)";
 export async function listProducts(
   kind?: ProductKind,
   admin = false,

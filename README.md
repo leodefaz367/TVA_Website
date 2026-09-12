@@ -2,14 +2,14 @@
 
 Web de Jiu Jitsu, MMA y Submission Grappling. Conserva el diseño original de TVA y agrega catálogo conectado a Supabase, variantes, carrito, órdenes pendientes y administración privada.
 
-**Estado:** la implementación compila y está conectada al proyecto Supabase `rhdyhndfhqvgbudjcbip`. Migración y semilla aplicadas, .env local configurado y comprobaciones REST aprobadas. Usuario administrador habilitado y sesión del panel verificada con lectura real de producto, variantes e imagen. Falta verificar escrituras, Storage y compra completa. Los productos permanecen en borrador hasta confirmar los datos comerciales.
+**Estado al 12/09/2026:** candidato local para Vercel/Next.js, sin publicación ni push durante esta auditoría. `npm run build` prepara el build de Vercel; `npm run dev` mantiene el desarrollo local en Vite. Ver [DEPLOYMENT.md](DEPLOYMENT.md), [SECURITY.md](SECURITY.md) y [AUDITORIA_RC.md](AUDITORIA_RC.md). La migración `202609120002_release_hardening.sql` está probada localmente y pendiente de aplicarse con autorización de lanzamiento. Deben verificarse los permisos reales de Drive, activar MFA y preparar recuperación antes de abrir tráfico público.
 
 La fase de seguridad está documentada en [SECURITY.md](SECURITY.md) y [SECURITY_AUDIT.md](SECURITY_AUDIT.md). La migración 202609100002_security.sql ya se aplicó en este proyecto. La actualización de instruccionales requiere aplicar después `202609110001_instructionals.sql`, aplicada y verificada en la base real el 11 de septiembre de 2026. Consulta [INSTRUCCIONALES.md](INSTRUCCIONALES.md) para activarla y operar la entrega manual por Drive. Antes de publicar, resolver los pendientes de producción documentados.
 
 ## Arquitectura
 
 - React 19 + TypeScript + Vite 8.
-- Vinext conserva las rutas de estilo Next.js en `app/` y genera un Worker compatible con la configuración de Sites existente.
+- Next.js genera la versión de producción para Vercel; Vinext conserva el desarrollo local en `app/` y un perfil anterior de Worker para compatibilidad.
 - Supabase PostgreSQL: catálogo, variantes, existencias, cursos, órdenes e información institucional.
 - Supabase Auth: inicio de sesión de administradores.
 - Supabase Storage: imágenes comerciales en el bucket público `product-images`.
@@ -139,7 +139,7 @@ npm run test:rendered
 npm run start
 ```
 
-Los comandos principales son compatibles con Windows. `npm run build` comprueba TypeScript, compila Vinext y valida el Worker y el manifiesto de Sites. El antiguo script Linux de instalación del starter se conserva como `install:ci`, pero no es necesario para trabajar en PowerShell.
+Los comandos principales son compatibles con Windows. `npm run build` valida la configuración y compila Next.js para Vercel en `.next-production`; `npm run test:production` comprueba ese build. El perfil anterior queda disponible como `npm run build:vinext` seguido de `npm run test:rendered`, sin publicar nada. El script Linux `install:ci` no es necesario en PowerShell.
 
 Las pruebas de PostgreSQL usan PGlite y ejecutan el SQL comercial real con esquemas mínimos de Auth/Storage para probar transacciones y RLS. **No prueban el servicio real de Supabase Auth, PostgREST o Storage, ni concurrencia multiconexión.** Los datos ficticios viven exclusivamente en pruebas.
 

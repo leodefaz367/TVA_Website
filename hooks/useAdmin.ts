@@ -8,6 +8,7 @@ export function useAdmin() {
     admin: boolean;
     email: string;
     error: string;
+    factorId?: string;
   }>({ loading: true, admin: false, email: "", error: "" });
   useEffect(() => {
     let active = true;
@@ -30,13 +31,36 @@ export function useAdmin() {
             await client.auth.getUser();
           if (userError || !userData.user)
             throw userError ?? new Error("Invalid session");
+          const assurance =
+            await client.auth.mfa.getAuthenticatorAssuranceLevel();
+          if (assurance.error) throw assurance.error;
+          if (
+            assurance.data.nextLevel === "aal2" &&
+            assurance.data.currentLevel !== "aal2"
+          ) {
+            const factors = await client.auth.mfa.listFactors();
+            if (factors.error) throw factors.error;
+            const factor = factors.data.totp.find(
+              (item) => item.status === "verified",
+            );
+            if (factor && active && current === revision) {
+              setState({
+                loading: false,
+                admin: false,
+                email: userData.user.email ?? "",
+                error: "",
+                factorId: factor.id,
+              });
+              return;
+            }
+          }
           const { data, error } = await client.rpc("is_admin");
           if (error) throw error;
           if (active && current === revision)
             setState({
               loading: false,
               admin: !!data,
-              email: session.user.email ?? "",
+              email: userData.user.email ?? "",
               error: data
                 ? ""
                 : "Esta cuenta no tiene permisos de administración.",

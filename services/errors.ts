@@ -1,5 +1,12 @@
 import { ValidationError } from "../utils/validation-error";
 const messages: Record<string, string> = {
+  INVALID_BANK_SETTINGS: "Revisa los datos de la cuenta bancaria.",
+  VARIANT_PRODUCT_IMMUTABLE:
+    "Una variante no puede trasladarse a otro producto.",
+  mfa_verification_failed:
+    "El código no es válido o ya venció. Inténtalo nuevamente.",
+  over_request_rate_limit:
+    "Hay demasiados intentos. Espera antes de volver a intentar.",
   DELIVERY_PENDING:
     "Todavía hay artículos sin entregar. Registra cada entrega antes de cerrar la orden.",
   COURSE_PUBLICATION_INCOMPLETE:

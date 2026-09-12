@@ -1,23 +1,22 @@
 import handler from "vinext/server/app-router-entry";
 import { secureResponse, securityPolicy } from "./security";
+import { canonicalUrl } from "../utils/site-origin";
+import { publicSupabaseUrl } from "../utils/public-config";
 const worker = {
   async fetch(
     request: Request,
-    env: { ASSETS: Fetcher },
+    env: { ASSETS: Fetcher; PRIMARY_SITE_URL?: string },
     ctx: ExecutionContext,
   ): Promise<Response> {
     const url = new URL(request.url);
-    const local = ["localhost", "127.0.0.1", "[::1]"].includes(url.hostname);
-    if (url.protocol !== "https:" && !local) {
-      url.protocol = "https:";
-      return Response.redirect(url.href, 308);
-    }
+    const canonical = canonicalUrl(request.url, env.PRIMARY_SITE_URL);
+    if (canonical) return Response.redirect(canonical, 308);
     const nonce = btoa(
       String.fromCharCode(...crypto.getRandomValues(new Uint8Array(24))),
     );
     const csp = securityPolicy(
       nonce,
-      import.meta.env.VITE_SUPABASE_URL || "https://invalid.supabase.co",
+      publicSupabaseUrl || "https://invalid.supabase.co",
     );
     const respond = (response: Response) =>
       secureResponse(response, request, csp);

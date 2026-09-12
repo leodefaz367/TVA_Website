@@ -2,7 +2,7 @@
 import { useState } from "react";
 import type { DeliveryChannel, Order, OrderItem } from "../../types/commerce";
 import { recordItemDelivery } from "../../services/admin";
-import { deliveryMessage } from "../../utils/instructionals";
+import { deliveryMessage, validateDriveUrl } from "../../utils/instructionals";
 import { ValidationError } from "../../utils/validation-error";
 import { useAction } from "../../hooks/useAction";
 import ActionFeedback from "./ActionFeedback";
@@ -34,7 +34,12 @@ export default function OrderDelivery({
   const delivery = item.order_item_deliveries;
   const legacy = order.status === "fulfilled" && !delivery;
   const digital = item.kind === "course";
-  const url = delivery?.drive_url ?? driveUrl;
+  let url: string | undefined;
+  try {
+    url = validateDriveUrl(delivery?.drive_url ?? driveUrl ?? "");
+  } catch {
+    /* Invalid legacy URLs are never rendered as links. */
+  }
   const email = delivery?.recipient_email ?? order.email;
   const copy = (text: string) =>
     void action.run(async () => {

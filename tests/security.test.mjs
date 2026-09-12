@@ -7,6 +7,28 @@ import {
   safeImageSource,
 } from "../utils/image-validation.ts";
 import { securityPolicy, secureResponse } from "../worker/security.ts";
+import { canonicalUrl, primaryOrigin } from "../utils/site-origin.ts";
+
+test("el dominio principal conserva rutas y no acepta redirecciones a orígenes inseguros", () => {
+  assert.equal(
+    canonicalUrl(
+      "https://www.academia.test/tienda?a=1",
+      "https://academia.test",
+    ),
+    "https://academia.test/tienda?a=1",
+  );
+  assert.equal(
+    canonicalUrl("http://127.0.0.1:5173/admin", "https://academia.test"),
+    null,
+  );
+  for (const url of [
+    "http://academia.test",
+    "https://evil@academia.test",
+    "https://academia.test/path",
+    "https://academia.test/?url=evil",
+  ])
+    assert.throws(() => primaryOrigin(url));
+});
 test("internal errors never escape to users; authored validation remains useful", () => {
   assert.doesNotMatch(
     errorMessage(new Error("SQL internal /private/server password=secret")),

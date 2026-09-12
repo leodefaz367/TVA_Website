@@ -1,4 +1,5 @@
 import { spawnSync } from "node:child_process";
+import "./check-production-env.mjs";
 import { fileURLToPath } from "node:url";
 process.env.WRANGLER_WRITE_LOGS ??= "false";
 process.env.WRANGLER_LOG_PATH ??= ".wrangler/logs";

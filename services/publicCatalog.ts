@@ -1,10 +1,12 @@
 import { createClient } from "@supabase/supabase-js";
 import type { Product } from "../types/commerce";
 import { productSelect } from "./catalog";
+import { publicSupabaseUrl, publicSupabaseKey } from "../utils/public-config";
 // Request-independent public client; never carries an administrative session.
 export async function getPublicProduct(slug: string): Promise<Product | null> {
-  const url = import.meta.env.VITE_SUPABASE_URL;
-  const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+  if (slug.length > 180 || !/^[a-z0-9]+(-[a-z0-9]+)*$/.test(slug)) return null;
+  const url = publicSupabaseUrl;
+  const key = publicSupabaseKey;
   if (!url || !key) throw new Error("Catalog is not configured");
   const client = createClient(url, key, {
     auth: {

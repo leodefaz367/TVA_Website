@@ -5,6 +5,8 @@ const patterns = [
   /-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/g,
   /AKIA[0-9A-Z]{16}/g,
   /gh[pousr]_[A-Za-z0-9]{30,}/g,
+  /(?:postgres(?:ql)?):\/\/[^\s:@]+:[^\s@]+@/g,
+  /sk_(?:live|test)_[A-Za-z0-9]{16,}/g,
 ];
 const findings = [];
 function scan(text, source) {
@@ -43,7 +45,11 @@ for (const name of (await readdir(".")).filter(
   const text = await readFile(name, "utf8");
   scan(text, name);
   for (const line of text.split("\n"))
-    if (/^VITE_.*(?:SECRET|SERVICE_ROLE|PASSWORD|PRIVATE)/.test(line))
+    if (
+      /^(?:VITE_|NEXT_PUBLIC_).*(?:SECRET|SERVICE_ROLE|PASSWORD|PRIVATE|DATABASE_URL)=.+/.test(
+        line,
+      )
+    )
       findings.push(name + ": private variable exposed to Vite");
 }
 scan(
@@ -54,10 +60,33 @@ scan(
   ),
   "reachable Git history",
 );
+let artifactFiles = 0;
+async function scanDirectory(path) {
+  let entries;
+  try {
+    entries = await readdir(path, { withFileTypes: true });
+  } catch (error) {
+    if (error.code === "ENOENT") return;
+    throw error;
+  }
+  for (const entry of entries) {
+    const child = path + "/" + entry.name;
+    if (entry.isDirectory()) await scanDirectory(child);
+    else if (/\.(?:html|m?js|json|map|txt|rsc)$/.test(entry.name)) {
+      scan(await readFile(child, "utf8"), child);
+      artifactFiles++;
+    }
+  }
+}
+await scanDirectory("dist");
+await scanDirectory(".next-production/static");
+await scanDirectory(".next-production/server/app");
+if (!artifactFiles)
+  throw new Error("Compila antes de comprobar secretos en el artefacto final.");
 if (findings.length) {
   console.error([...new Set(findings)].join("\n"));
   process.exit(1);
 }
 console.log(
-  "Secret patterns: no findings in source, local env or reachable Git history. Heuristic scan; not proof of absence.",
+  `Secret patterns: no findings in source, local env, reachable Git history or ${artifactFiles} build files. Heuristic scan; not proof of absence.`,
 );

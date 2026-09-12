@@ -4,6 +4,7 @@ import { useState, type FormEvent, type ReactNode } from "react";
 import { useAdmin } from "../../hooks/useAdmin";
 import { getSupabase } from "../../services/supabase";
 import { errorMessage } from "../../services/errors";
+import { MfaChallenge } from "./MfaPanel";
 export default function AdminGate({ children }: { children: ReactNode }) {
   const auth = useAdmin();
   const [email, setEmail] = useState("");
@@ -46,6 +47,8 @@ export default function AdminGate({ children }: { children: ReactNode }) {
       </header>
       {auth.loading ? (
         <p role="status">Comprobando sesión…</p>
+      ) : auth.factorId ? (
+        <MfaChallenge factorId={auth.factorId} />
       ) : auth.admin ? (
         <>
           {error && <p role="alert">{error}</p>}
@@ -67,6 +70,7 @@ export default function AdminGate({ children }: { children: ReactNode }) {
                 type="email"
                 autoComplete="username"
                 required
+                maxLength={254}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
@@ -77,6 +81,7 @@ export default function AdminGate({ children }: { children: ReactNode }) {
                 type="password"
                 autoComplete="current-password"
                 required
+                maxLength={1024}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />

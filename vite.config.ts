@@ -44,6 +44,7 @@ export default defineConfig(async () => {
   const { cloudflare } = await import("@cloudflare/vite-plugin");
 
   return {
+    define: { __TVA_VINEXT__: "true" },
     server: {
       host: "127.0.0.1",
       allowedHosts: ["terminal.local"],

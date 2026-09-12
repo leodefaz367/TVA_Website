@@ -5,7 +5,7 @@ import { ValidationError } from "../utils/validation-error";
 export type AcademyPhoto = { id: string; url: string; alt: string };
 export const originalAcademyPhoto: AcademyPhoto = {
   id: "original",
-  url: "/assets/training.png",
+  url: "/assets/Grupo.jpeg",
   alt: "Entrenamiento de grappling en Team Vivas Academy",
 };
 export async function listAcademyPhotos(): Promise<AcademyPhoto[]> {
