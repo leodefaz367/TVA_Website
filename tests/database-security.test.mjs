@@ -21,6 +21,7 @@ test("security migration enforces roles, revocation, quotas and auditing", async
     for (const file of [
       "202609100001_commerce.sql",
       "202609100002_security.sql",
+      "202609120001_academy_photos.sql",
     ])
       await db.exec(
         await readFile(
@@ -256,6 +257,44 @@ test("security migration enforces roles, revocation, quotas and auditing", async
         await db.query(
           "insert into storage.objects(bucket_id,name) values ('product-images',$1)",
           [p + "/" + crypto.randomUUID() + ".png"],
+        );
+      },
+    );
+    await t.test(
+      "academy uploads append and only administrators can write",
+      async () => {
+        await identity(admin, session);
+        await db.query(
+          "insert into public.academy_photos(url,alt) values ('https://example.com/one.jpg','Primera'),('https://example.com/two.jpg','Segunda')",
+        );
+        assert.equal(
+          (await db.query("select * from public.academy_photos")).rows.length,
+          2,
+        );
+        await db.query(
+          "insert into storage.objects(bucket_id,name) values ('academy-images',$1)",
+          [crypto.randomUUID() + ".jpg"],
+        );
+        await assert.rejects(() =>
+          db.query(
+            "insert into storage.objects(bucket_id,name) values ('academy-images','bad.svg')",
+          ),
+        );
+        await identity(ordinary);
+        assert.equal(
+          (await db.query("select * from public.academy_photos")).rows.length,
+          2,
+        );
+        await assert.rejects(() =>
+          db.query(
+            "insert into public.academy_photos(url,alt) values ('x','No permitido')",
+          ),
+        );
+        await assert.rejects(() =>
+          db.query(
+            "insert into storage.objects(bucket_id,name) values ('academy-images',$1)",
+            [crypto.randomUUID() + ".jpg"],
+          ),
         );
       },
     );

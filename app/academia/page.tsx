@@ -1,4 +1,4 @@
-import SiteImage from "../../components/SiteImage";
+import AcademyGallery from "../../components/AcademyGallery";
 export default function AcademiaPage() {
   return (
     <main>
@@ -42,14 +42,7 @@ export default function AcademiaPage() {
           </div>
         </div>
 
-        <div className="academy-photo">
-          <SiteImage
-            src="/assets/training.png"
-            alt="Entrenamiento de grappling en Team Vivas Academy"
-          />
-
-          <span>DISCIPLINA · TÉCNICA · COMUNIDAD</span>
-        </div>
+        <AcademyGallery />
       </section>
     </main>
   );

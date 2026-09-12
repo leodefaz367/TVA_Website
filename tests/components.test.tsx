@@ -10,6 +10,33 @@ import {
 import { CartProvider, useCart } from "../hooks/useCart";
 import { ProductView } from "../components/catalog/ProductDetail";
 import Trailer from "../components/Trailer";
+import { AcademyCarousel } from "../components/AcademyGallery";
+
+test("la galería recorre las fotos con botones, teclado y deslizamiento", () => {
+  render(
+    <AcademyCarousel
+      photos={[
+        { id: "a", url: "/assets/training.png", alt: "Original" },
+        { id: "b", url: "/assets/logo-tva.png", alt: "Adicional" },
+      ]}
+    />,
+  );
+  assert.ok(screen.getByAltText("Original"));
+  fireEvent.click(screen.getByRole("button", { name: "Foto siguiente" }));
+  assert.ok(screen.getByAltText("Adicional"));
+  fireEvent.keyDown(screen.getByRole("button", { name: "Foto siguiente" }), {
+    key: "ArrowRight",
+  });
+  assert.ok(screen.getByAltText("Original"));
+  const photo = screen.getByAltText("Original").parentElement!;
+  fireEvent.touchStart(photo, { touches: [{ clientX: 200, clientY: 100 }] });
+  fireEvent.touchEnd(photo, {
+    changedTouches: [{ clientX: 80, clientY: 105 }],
+  });
+  assert.ok(screen.getByAltText("Adicional"));
+  fireEvent.click(screen.getByRole("button", { name: "Foto anterior" }));
+  assert.ok(screen.getByAltText("Original"));
+});
 import OrderDelivery from "../components/admin/OrderDelivery";
 import DigitalPriceEditor from "../components/admin/DigitalPriceEditor";
 import type { Product } from "../types/commerce";

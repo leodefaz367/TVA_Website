@@ -8,6 +8,7 @@ import { listCategories } from "../../services/catalog";
 import { AsyncState } from "../AsyncState";
 import ActionFeedback from "./ActionFeedback";
 import BankTransferEditor from "./BankTransferEditor";
+import AcademyPhotosEditor from "./AcademyPhotosEditor";
 async function loadSettings() {
   const { data, error } = await getSupabase().from("site_settings").select("*");
   if (error) throw error;
@@ -22,6 +23,7 @@ export default function SettingsPanel() {
   return (
     <section>
       <h2>Información y categorías</h2>
+      <AcademyPhotosEditor />
       <BankTransferEditor />
       <AsyncState
         loading={settings.loading}

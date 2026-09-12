@@ -9,7 +9,7 @@ export function securityPolicy(nonce: string, supabaseUrl: string) {
     `style-src 'self' 'nonce-${nonce}'`,
     // React image styles need attributes; scripts never allow unsafe-inline/eval.
     "style-src-attr 'unsafe-inline'",
-    `img-src 'self' ${origin}/storage/v1/object/public/product-images/ data:`,
+    `img-src 'self' ${origin}/storage/v1/object/public/product-images/ ${origin}/storage/v1/object/public/academy-images/ data:`,
     "font-src 'self'",
     `connect-src 'self' ${origin}`,
     "object-src 'none'",

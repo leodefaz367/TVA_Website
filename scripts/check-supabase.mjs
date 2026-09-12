@@ -19,6 +19,7 @@ for (const table of [
   "instructional_courses",
   "instructional_modules",
   "site_settings",
+  "academy_photos",
 ]) {
   const { error } = await client
     .from(table)

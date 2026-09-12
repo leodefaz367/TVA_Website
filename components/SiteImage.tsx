@@ -16,7 +16,7 @@ export default function SiteImage({
       {...props}
       src={
         typeof src === "string"
-          ? safeImageSource(src, import.meta.env.VITE_SUPABASE_URL)
+          ? safeImageSource(src, import.meta.env?.VITE_SUPABASE_URL)
           : src
       }
       unoptimized

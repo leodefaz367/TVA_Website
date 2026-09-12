@@ -30,7 +30,8 @@ export function safeImageSource(src: string, supabaseUrl?: string) {
       !url.username &&
       !url.password &&
       url.origin === new URL(supabaseUrl).origin &&
-      url.pathname.startsWith("/storage/v1/object/public/product-images/")
+      (url.pathname.startsWith("/storage/v1/object/public/product-images/") ||
+        url.pathname.startsWith("/storage/v1/object/public/academy-images/"))
     )
       return url.href;
   } catch {
