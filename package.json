@@ -14,7 +14,7 @@
     "build": "node scripts/build-vercel.mjs",
     "build:vinext": "node scripts/build.mjs",
     "start": "next start --hostname 127.0.0.1",
-    "test": "node --import tsx --test tests/commerce.test.mjs tests/database.test.mjs tests/database-security.test.mjs tests/security.test.mjs tests/instructionals.test.mjs",
+    "test": "node --import tsx --test tests/commerce.test.mjs tests/database.test.mjs tests/database-security.test.mjs tests/security.test.mjs tests/instructionals.test.mjs tests/orders.test.mjs",
     "validate:artifact": "node scripts/validate-artifact.mjs",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit --incremental false",

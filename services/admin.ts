@@ -75,16 +75,59 @@ export async function saveCategory(
   if (error) throw error;
   return data as Category;
 }
-export async function listOrders(): Promise<Order[]> {
-  const { data, error } = await getSupabase()
+export const ORDERS_PAGE_SIZE = 25;
+export type OrderFilters = {
+  search: string;
+  field: "email" | "customer_name" | "id";
+  status: OrderStatus | "";
+  from: string;
+  to: string;
+};
+export async function listOrders(page = 1, filters?: OrderFilters) {
+  if (!Number.isSafeInteger(page) || page < 1)
+    throw new ValidationError("La página no es válida.");
+  let query = getSupabase()
     .from("orders")
     .select(
       "id, customer_name, email, phone, delivery_method, notes, status, subtotal_cents, total_cents, created_at, updated_at, order_items(id, order_id, product_id, variant_id, product_name, variant_label, sku, kind, quantity, unit_price_cents, order_item_deliveries(*))",
-    )
+      { count: "exact" },
+    );
+  const search = filters?.search.trim();
+  if (search && filters) {
+    if (filters.field === "id") {
+      if (
+        !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+          search,
+        )
+      )
+        throw new ValidationError(
+          "Ingresa la referencia completa de la orden.",
+        );
+      query = query.eq("id", search);
+    } else {
+      const literal = search.replace(/[\\%_*]/g, "\\$&");
+      query = query.ilike(filters.field, `%${literal}%`);
+    }
+  }
+  if (filters?.status) query = query.eq("status", filters.status);
+  if (filters?.from && filters?.to && filters.from > filters.to)
+    throw new ValidationError(
+      "La fecha inicial no puede ser posterior a la final.",
+    );
+  // Academy business dates use Ecuador continental time (UTC-5).
+  if (filters?.from)
+    query = query.gte("created_at", `${filters.from}T00:00:00-05:00`);
+  if (filters?.to) {
+    const end = new Date(`${filters.to}T00:00:00-05:00`);
+    end.setUTCDate(end.getUTCDate() + 1);
+    query = query.lt("created_at", end.toISOString());
+  }
+  const { data, error, count } = await query
     .order("created_at", { ascending: false })
-    .limit(200);
+    .order("id", { ascending: false })
+    .range((page - 1) * ORDERS_PAGE_SIZE, page * ORDERS_PAGE_SIZE - 1);
   if (error) throw error;
-  return data.map((order) => ({
+  const orders = data.map((order) => ({
     ...order,
     order_items: order.order_items.map((item) => ({
       ...item,
@@ -93,6 +136,7 @@ export async function listOrders(): Promise<Order[]> {
         : item.order_item_deliveries,
     })),
   })) as unknown as Order[];
+  return { orders, total: count ?? 0 };
 }
 export async function changeOrderStatus(id: string, status: OrderStatus) {
   const { error } = await getSupabase().rpc("change_order_status", {
