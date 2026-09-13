@@ -64,7 +64,7 @@ En Vercel elige **Add New → Project**, conecta GitHub y permite acceso solo al
 - Node.js: 24.x.
 - Build Command: `npm run build:vercel` (vercel.json lo fija explícitamente).
 - Install Command: `npm ci`.
-- Output Directory: automático de Next.js; no escribir dist ni public.
+- Output Directory: `.next-production`, definido también en `vercel.json` para coincidir con `distDir` de `next.config.ts`. No usar `.next`, `dist` ni `public`.
 
 No configurar rewrite universal a index.html: no es una SPA con React Router. Las fichas y administración usan App Router con render de servidor. Vercel no usa la configuración histórica .openai/hosting.json ni publica en ChatGPT.
 
